@@ -20,3 +20,21 @@ from django.urls import path
 urlpatterns = [
     path('admin/', admin.site.urls),
 ]
+
+from django.contrib import admin
+from django.urls import path, include
+from rest_framework.routers import DefaultRouter
+from users.views import UserViewSet, UserProfileViewSet
+from resumes.views import ResumeViewSet
+from jobs.views import JobViewSet
+
+router = DefaultRouter()
+router.register(r'users', UserViewSet, basename='user')
+router.register(r'profiles', UserProfileViewSet, basename='profile')
+router.register(r'resumes', ResumeViewSet, basename='resume')
+router.register(r'jobs', JobViewSet, basename='job')
+
+urlpatterns = [
+    path('admin/', admin.site.urls),
+    path('api/', include(router.urls)),
+]
