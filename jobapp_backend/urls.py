@@ -1,32 +1,18 @@
-"""
-URL configuration for jobapp_backend project.
-
-The `urlpatterns` list routes URLs to views. For more information please see:
-    https://docs.djangoproject.com/en/5.2/topics/http/urls/
-Examples:
-Function views
-    1. Add an import:  from my_app import views
-    2. Add a URL to urlpatterns:  path('', views.home, name='home')
-Class-based views
-    1. Add an import:  from other_app.views import Home
-    2. Add a URL to urlpatterns:  path('', Home.as_view(), name='home')
-Including another URLconf
-    1. Import the include() function: from django.urls import include, path
-    2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
-"""
-from django.contrib import admin
-from django.urls import path
-
-urlpatterns = [
-    path('admin/', admin.site.urls),
-]
+# jobapp_backend/urls.py
 
 from django.contrib import admin
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
-from users.views import UserViewSet, UserProfileViewSet
+
+# Replace default SimpleJWT import with custom view
+# from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
+from users.auth_views import MyTokenObtainPairView
+from rest_framework_simplejwt.views import TokenRefreshView
+
+from users.views import UserViewSet, UserProfileViewSet, RegisterView
 from resumes.views import ResumeViewSet
 from jobs.views import JobViewSet
+from django.contrib.auth import views as auth_views
 
 router = DefaultRouter()
 router.register(r'users', UserViewSet, basename='user')
@@ -35,18 +21,28 @@ router.register(r'resumes', ResumeViewSet, basename='resume')
 router.register(r'jobs', JobViewSet, basename='job')
 
 urlpatterns = [
+    # Admin
     path('admin/', admin.site.urls),
-    path('api/', include(router.urls)),
-]
 
-from rest_framework_simplejwt.views import (
-    TokenObtainPairView,
-    TokenRefreshView,
-)
-
-urlpatterns = [
-    path('admin/', admin.site.urls),
+    # API router
     path('api/', include(router.urls)),
-    path('api/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
+
+    # JWT auth
+    # path('api/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
+    path('api/token/', MyTokenObtainPairView.as_view(), name='token_obtain_pair'),
     path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
+
+    # User registration
+    path('api/register/', RegisterView.as_view(), name='register'),
+
+    # Password reset
+    path('api/password-reset/', auth_views.PasswordResetView.as_view(), name='password_reset'),
+    path('api/password-reset/done/', auth_views.PasswordResetDoneView.as_view(), name='password_reset_done'),
+    path(
+        'api/password-reset-confirm/<uidb64>/<token>/',
+        auth_views.PasswordResetConfirmView.as_view(),
+        name='password_reset_confirm'
+    ),
+    path('api/password-reset-complete/', auth_views.PasswordResetCompleteView.as_view(),
+         name='password_reset_complete'),
 ]

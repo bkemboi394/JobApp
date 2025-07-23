@@ -31,6 +31,7 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
+    'corsheaders',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -54,6 +55,8 @@ REST_FRAMEWORK = {
 }
 
 MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware',
+    'django.middleware.common.CommonMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -86,12 +89,36 @@ WSGI_APPLICATION = 'jobapp_backend.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.sqlite3',
+#         'NAME': BASE_DIR / 'db.sqlite3',
+#     }
+# }
+
+import os
+import environ
+from pathlib import Path
+
+
+env = environ.Env()
+
+env_file = BASE_DIR / '.env'
+
+environ.Env.read_env(env_file=str(env_file))
+
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE':   'django.db.backends.postgresql',
+        'NAME':     env('POSTGRES_DB'),
+        'USER':     env('POSTGRES_USER'),
+        'PASSWORD': env('POSTGRES_PASSWORD'),
+        'HOST':     env('POSTGRES_HOST'),
+        'PORT':     env('POSTGRES_PORT'),
     }
 }
+
+
 
 
 # Password validation
@@ -134,3 +161,15 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+CORS_ALLOWED_ORIGINS = [
+  "http://localhost:3000",
+]
+
+# (Or for dev only)
+CORS_ALLOW_ALL_ORIGINS = TrueCORS_ALLOWED_ORIGINS = [
+  "http://localhost:3000",
+]
+
+# (Or for dev only)
+CORS_ALLOW_ALL_ORIGINS = True
