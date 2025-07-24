@@ -119,6 +119,11 @@ DATABASES = {
 }
 
 
+import openai
+
+OPENAI_API_KEY = env("OPENAI_API_KEY")
+openai.api_key = OPENAI_API_KEY
+
 
 
 # Password validation
