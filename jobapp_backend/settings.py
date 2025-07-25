@@ -121,8 +121,11 @@ DATABASES = {
 
 import openai
 
-OPENAI_API_KEY = env("OPENAI_API_KEY")
-openai.api_key = OPENAI_API_KEY
+OPENAI_API_KEY = os.environ.get("OPENAI_API_KEY")
+if OPENAI_API_KEY:
+    openai.api_key = OPENAI_API_KEY
+else:
+    print("Warning: OPENAI_API_KEY not found in environment variables")
 
 
 
